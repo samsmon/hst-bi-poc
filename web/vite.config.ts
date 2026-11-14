@@ -1,13 +1,13 @@
-import react from "@vitejs/plugin-react";
+import { svelte } from "@sveltejs/vite-plugin-svelte";
 import { defineConfig } from "vite";
 
-// Dev server proxies the API so the browser talks to one origin.
+// The dev server proxies the Go server so the browser talks to one origin.
 export default defineConfig({
-  plugins: [react()],
+  plugins: [svelte()],
   server: {
     proxy: {
-      "/api": "http://127.0.0.1:8000",
-      "/health": "http://127.0.0.1:8000",
+      "/api": "http://127.0.0.1:8610",
+      "/health": "http://127.0.0.1:8610",
     },
   },
 });
