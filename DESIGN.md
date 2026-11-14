@@ -16,7 +16,14 @@ Source of truth for the UI. The Figma file implements these tokens as variables,
 | SQL console | [sql-console-light.png](design/sql-console-light.png) | [sql-console-dark.png](design/sql-console-dark.png) |
 | States (loading, empty, error, rejected, truncated, stale, forbidden) | [states-light.png](design/states-light.png) | |
 
-All numbers in the mockups are illustrative except the ticket count (10,815,864) and the net revenue total (IDR 2.235 T). Query text in the SQL console is real SQL against the dataset columns.
+Numbers in the mockups are real values queried from `hst_dataset` on 2026-11-15 through the read-only role: KPIs, the monthly revenue by season type, channel mix, top routes, and the SQL console query with its 32 result rows and 1.9 s timing. On the Forecast screen the actuals are real, and the forecast is a seasonal-naive baseline computed from them (2026 month = same month of 2025), with an 80% band from the 10th to 90th percentile of its 2025 backtest errors (WAPE 3.9%, MAE 8,080 tickets). It is labeled as demo data because it is not the team's model. The States sheet uses example copy.
+
+What the real data changed in the design:
+- Season types are date-exclusive, so the Overview trend is a stacked monthly bar chart, not one line per season.
+- `COVID restriction` is its own season series (gray).
+- Seat capacity is not a constant 600: trips carry 300, 450, or 600 seats, so capacity is summed per trip.
+- Forecast demand peaks at 68% of capacity, so the capacity panel shows "no shortfall" instead of a warning.
+- Full-table aggregates take 6 to 13 seconds without pre-aggregation, far above the 2 second target; the footer shows the measured time.
 
 ## Brief
 - Purpose: explore ticket sales of the HST dataset, run read-only SQL, and read ML forecasts next to actuals.
