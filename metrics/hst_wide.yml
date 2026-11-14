@@ -1,0 +1,34 @@
+# Semantic layer for the raw wide table. Columns come from the dataset's
+# docs/dwbi-guide.md (v0.3.0). When the snowflake warehouse exists, a new
+# file maps the same metric and dimension names onto its tables.
+source:
+  database: hst_dataset
+  table: fact_ticket_sales_wide   # verify schema and name in P2
+  time_column: travel_date
+
+measures:
+  tickets:        { sql: "count(*)",               label: Tickets, format: integer }
+  gross_revenue:  { sql: "sum(total_price)",       label: Gross revenue, format: idr }
+  net_revenue:    { sql: "sum(net_revenue)",       label: Net revenue, format: idr }
+  refund_amount:  { sql: "sum(refund_amount)",     label: Refund amount, format: idr }
+  refund_rate:    { sql: "avg(is_refunded::int)",  label: Refund rate, format: percent }
+  avg_lead_time:  { sql: "avg(lead_time_days)",    label: Average lead time (days), format: decimal }
+  avg_discount:   { sql: "avg(discount_pct)",      label: Average discount (%), format: decimal }
+
+dimensions:
+  travel_date:        { type: time, label: Travel date }
+  season_type:        { type: category, label: Season }
+  time_slot:          { type: category, label: Time slot }
+  travel_direction:   { type: category, label: Direction }
+  route_name:         { type: category, label: Route }
+  origin_station_name:      { type: category, label: Origin }
+  destination_station_name: { type: category, label: Destination }
+  sales_channel_name: { type: category, label: Channel }
+  payment_method:     { type: category, label: Payment method }
+  seat_class:         { type: category, label: Seat class }
+  promo_type:         { type: category, label: Promo type }
+  fcc_card_type:      { type: category, label: FCC card }
+  company_type:       { type: category, label: Company type }
+  customer_city:      { type: category, label: Customer city }
+  ticket_status:      { type: category, label: Ticket status }
+  customer_segment:   { type: category, label: Segment (ground truth), note: "Generator fact, not observable in real data" }

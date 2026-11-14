@@ -1,0 +1,19 @@
+# App stack: api + web. Postgres is NOT part of this file; it is the shared
+# instance on the host. Secrets come from .env (never committed).
+services:
+  api:
+    build: ./api
+    restart: unless-stopped
+    environment:
+      BI_ALLOWED_SCHEMAS: ${BI_ALLOWED_SCHEMAS:-public,ml}
+      # Wired in P4: DATABASE_URL with the bi_reader role.
+    mem_limit: 512m
+
+  web:
+    build: ./web
+    restart: unless-stopped
+    depends_on: [api]
+    ports:
+      # Bind to the Tailscale or loopback address only, never 0.0.0.0.
+      - "${BIND_ADDR:-127.0.0.1}:${WEB_PORT:-8610}:80"
+    mem_limit: 64m
