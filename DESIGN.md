@@ -1,6 +1,6 @@
 # Design principles
 
-Working rules for the UI. A Figma mockup pass (`/figma` workflow in cloud-ops) comes before the P4 screens; until then this file is the source of truth, and the tokens below are placeholders to be confirmed in that pass.
+Working rules for the UI. A Figma mockup pass comes before the P4 screens; until then this file is the source of truth, and the tokens below are placeholders to be confirmed in that pass.
 
 ## Principles
 1. The data is the interface. Charts and tables get the space; chrome stays quiet.
