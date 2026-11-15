@@ -1,0 +1,8 @@
+# Password and host come from EVIDENCE_SOURCE__hst__password / __host.
+name: hst
+type: postgres
+options:
+  port: 5432
+  database: hst_dataset
+  user: bi_reader
+  ssl: false

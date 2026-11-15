@@ -1,0 +1,50 @@
+# Temporary benchmark stack (phase P3): Superset and Evidence reading the same
+# PostgreSQL as the read-only role. Start with:
+#   docker compose --env-file ../.env -f compose.benchmark.yml up -d --build
+# ../.env (never committed) provides BIND_ADDR, BI_READER_PASSWORD,
+# SUPERSET_SECRET_KEY and SUPERSET_ADMIN_PASSWORD.
+services:
+  superset:
+    build:
+      context: .
+      dockerfile: Dockerfile.superset
+    container_name: hst-bi-superset
+    environment:
+      BI_READER_PASSWORD: ${BI_READER_PASSWORD}
+      SUPERSET_SECRET_KEY: ${SUPERSET_SECRET_KEY}
+      SUPERSET_ADMIN_PASSWORD: ${SUPERSET_ADMIN_PASSWORD}
+      PG_HOST: ${PG_HOST:-shared-postgres}
+    command: ["/bin/sh", "/app/superset-init.sh"]
+    volumes:
+      - superset_home:/app/superset_home
+      - ./superset_config.py:/app/pythonpath/superset_config.py:ro
+      - ./superset-init.sh:/app/superset-init.sh:ro
+    ports:
+      - "${BIND_ADDR:-127.0.0.1}:8611:8088"
+    mem_limit: 2g
+    networks: [shared_net]
+
+  evidence:
+    image: node:22-bookworm-slim
+    container_name: hst-bi-evidence
+    working_dir: /work
+    environment:
+      EVIDENCE_SOURCE__hst__password: ${BI_READER_PASSWORD}
+      EVIDENCE_SOURCE__hst__host: ${PG_HOST:-shared-postgres}
+    command: ["/bin/sh", "/src/run.sh"]
+    volumes:
+      - ./evidence:/src:ro
+      - evidence_work:/work
+    ports:
+      - "${BIND_ADDR:-127.0.0.1}:8612:3000"
+    # The static build was OOM-killed at 1g (measured 2026-11-15).
+    mem_limit: 2g
+    networks: [shared_net]
+
+networks:
+  shared_net:
+    external: true
+
+volumes:
+  superset_home:
+  evidence_work:

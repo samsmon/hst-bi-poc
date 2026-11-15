@@ -18,7 +18,7 @@ flowchart LR
 | Web | `web/` | Svelte 5, Vite, TypeScript. Charts (uPlot), motion (GSAP) and the SQL editor (CodeMirror) arrive in P4. |
 | Semantic layer | `metrics/` | YAML measures and dimensions. Swapping the warehouse changes these files, not the UI. |
 | SQL | `sql/` | Role and ML schema scripts. Reviewed before use, never run automatically. |
-| Benchmark | `benchmark/` | Query set for comparing against Superset and Evidence (phase P3). |
+| Benchmark | `benchmark/` | Phase P3 scripts and [results](benchmark/RESULTS.md): PostgreSQL with and without pre-aggregation, Superset, Evidence. |
 | Design | `DESIGN.md` | UI rules and the visual language for forecasts. |
 
 Targets: initial JavaScript bundle under 150 KB gzip, idle server memory under 50 MB. Current measurements: web shell about 10 KB gzip; the Go binary is about 14 MB and used about 52 MB private memory on Windows after 200 requests, so the memory target still needs a measurement on Linux.

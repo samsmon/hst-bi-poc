@@ -1,0 +1,13 @@
+q1_yearly_kpi_raw	select extract(year from travel_date)::int y, count(*), sum(total_price), sum(net_revenue), avg(is_refunded::int), avg(lead_time_days) from public.fact_ticket_sales_wide group by 1 order by 1
+q1_yearly_kpi_mv	select extract(year from month)::int y, sum(tickets), sum(gross_revenue), sum(net_revenue), sum(refunded_tickets)::numeric/sum(tickets), sum(lead_time_days_sum)::numeric/sum(tickets) from bi.mv_monthly_sales group by 1 order by 1
+q2_monthly_season_raw	select date_trunc('month', travel_date)::date m, season_type, sum(net_revenue) from public.fact_ticket_sales_wide group by 1, 2 order by 1, 2
+q2_monthly_season_mv	select month, season_type, sum(net_revenue) from bi.mv_monthly_sales group by 1, 2 order by 1, 2
+q3_top_routes_raw	select origin_station_name, destination_station_name, count(*), sum(net_revenue), avg(is_refunded::int) from public.fact_ticket_sales_wide group by 1, 2 order by 3 desc limit 10
+q3_top_routes_mv	select origin_station_name, destination_station_name, sum(tickets), sum(net_revenue), sum(refunded_tickets)::numeric/sum(tickets) from bi.mv_monthly_sales group by 1, 2 order by 3 desc limit 10
+q4_channel_year_raw	select extract(year from travel_date)::int y, sales_channel_name, count(*) from public.fact_ticket_sales_wide group by 1, 2 order by 1, 2
+q4_channel_year_mv	select extract(year from month)::int y, sales_channel_name, sum(tickets) from bi.mv_monthly_sales group by 1, 2 order by 1, 2
+q5_refund_by_lead_raw	select width_bucket(lead_time_days, 0, 60, 6) b, count(*), avg(is_refunded::int) from public.fact_ticket_sales_wide group by 1 order by 1
+q6_occupancy_raw	select avg(load) from (select trip_no, travel_date, count(*)::numeric / max(seat_capacity) load from public.fact_ticket_sales_wide where travel_date >= date '2025-01-01' group by 1, 2) t
+q7_distinct_customers_raw	select extract(year from travel_date)::int y, count(distinct customer_id) from public.fact_ticket_sales_wide group by 1 order by 1
+q8_filtered_month_raw	select season_type, count(*), sum(net_revenue) from public.fact_ticket_sales_wide where travel_date >= date '2025-06-01' and travel_date < date '2025-07-01' group by 1
+q8_filtered_month_mv	select season_type, sum(tickets), sum(net_revenue) from bi.mv_monthly_sales where month = date '2025-06-01' group by 1
