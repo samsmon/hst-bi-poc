@@ -1,0 +1,57 @@
+# Semantic model over the pre-aggregated cube bi.mv_monthly_sales
+# (sql/03_bi_matviews.sql). The UI asks for measures and dimensions by name;
+# only this file knows table and column names. When the snowflake warehouse
+# replaces the wide table, a new model keeps the same names.
+name: monthly_sales
+label: Ticket sales (monthly)
+source: bi.mv_monthly_sales
+time_column: month
+
+measures:
+  tickets:
+    sql: sum(tickets)
+    label: Tickets
+    format: integer
+  gross_revenue:
+    sql: sum(gross_revenue)
+    label: Gross revenue
+    format: idr
+  net_revenue:
+    sql: sum(net_revenue)
+    label: Net revenue
+    format: idr
+  refund_amount:
+    sql: sum(refund_amount)
+    label: Refund amount
+    format: idr
+  refund_rate:
+    sql: sum(refunded_tickets)::float8 / nullif(sum(tickets), 0)
+    label: Refund rate
+    format: percent
+  avg_lead_time:
+    sql: sum(lead_time_days_sum)::float8 / nullif(sum(tickets), 0)
+    label: Average lead time
+    format: days
+
+dimensions:
+  season_type:
+    sql: season_type
+    label: Season
+  channel:
+    sql: sales_channel_name
+    label: Channel
+  route:
+    sql: route_name
+    label: Route
+  origin:
+    sql: origin_station_name
+    label: Origin
+  destination:
+    sql: destination_station_name
+    label: Destination
+  od:
+    sql: origin_station_name || ' - ' || destination_station_name
+    label: Origin to destination
+  seat_class:
+    sql: seat_class
+    label: Seat class
