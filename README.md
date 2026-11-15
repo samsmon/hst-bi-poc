@@ -2,7 +2,7 @@
 
 A self-built, read-only business intelligence dashboard for the [HST synthetic dataset](https://github.com/samsmon/hst-synthetic-dataset) (v0.3.0, 10.8 million ticket records). It has dashboards, a SQL console limited to `SELECT`, and pages for machine learning forecasts.
 
-Status: phase P1 (foundation). The server validates SQL but does not yet query a database; the web app is a shell.
+Status: phase P4 (first screens). The server queries PostgreSQL as a read-only role through a YAML semantic model and a guarded SQL console. The web app has Overview and SQL console pages using real data. Not done yet: global filters, the other dashboard pages, forecasts, authentication.
 
 ## Architecture
 
@@ -15,7 +15,7 @@ flowchart LR
 | Part | Path | Notes |
 |---|---|---|
 | Server | `server/` | Go. `internal/sqlguard` validates console SQL with the PostgreSQL parser (`pg_query_go`, needs cgo). `internal/api` holds routes. `internal/webui` embeds the built web app. |
-| Web | `web/` | Svelte 5, Vite, TypeScript. Charts (uPlot), motion (GSAP) and the SQL editor (CodeMirror) arrive in P4. |
+| Web | `web/` | Svelte 5, Vite, TypeScript. Charts are hand-drawn SVG so far; uPlot, GSAP and CodeMirror come with the forecast page and a richer editor. |
 | Semantic layer | `metrics/` | YAML measures and dimensions. Swapping the warehouse changes these files, not the UI. |
 | SQL | `sql/` | Role and ML schema scripts. Reviewed before use, never run automatically. |
 | Benchmark | `benchmark/` | Phase P3 scripts and [results](benchmark/RESULTS.md): PostgreSQL with and without pre-aggregation, Superset, Evidence. |
@@ -63,3 +63,14 @@ To embed the web build into the binary locally, copy `web/dist/*` into `server/i
 | P6 | Hardening and security audit |
 
 Planning notes and decisions are kept in a separate notes repository.
+
+## Run against the real database (development)
+
+```bash
+# 1. tunnel to the shared PostgreSQL (port 5432 is not exposed on the LAN)
+ssh -N -L 15432:127.0.0.1:5432 docker-host
+# 2. .env (gitignored): DATABASE_URL=postgresql://bi_reader:<password>@127.0.0.1:15432/hst_dataset
+# 3. build the web app, embed it, run the server
+cd web && npm run build && cp -r dist/* ../server/internal/webui/dist/
+cd ../server && go run ./cmd/hst-bi        # needs a C compiler (cgo)
+```

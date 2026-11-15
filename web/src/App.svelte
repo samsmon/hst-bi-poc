@@ -1,29 +1,35 @@
 <script lang="ts">
-  type Status = "checking" | "ok" | "down";
-  let server = $state<Status>("checking");
+  import Nav from "./lib/Nav.svelte";
+  import Overview from "./pages/Overview.svelte";
+  import Sql from "./pages/Sql.svelte";
 
+  const read = () => (location.hash.replace(/^#\/?/, "") || "overview").split("?")[0];
+  let page = $state(read());
   $effect(() => {
-    fetch("/health")
-      .then((r) => (server = r.ok ? "ok" : "down"))
-      .catch(() => (server = "down"));
+    const on = () => (page = read());
+    window.addEventListener("hashchange", on);
+    return () => window.removeEventListener("hashchange", on);
   });
 </script>
 
-<main>
-  <h1>hst-bi</h1>
-  <p class="muted">
-    Foundation only. Dashboards and the SQL console arrive in phase P4.
-  </p>
-  <p>Server: {server}</p>
-</main>
+<div class="app">
+  <Nav {page} />
+  <main>
+    {#if page === "sql"}
+      <Sql />
+    {:else}
+      <Overview />
+    {/if}
+  </main>
+</div>
 
 <style>
-  main {
-    max-width: 720px;
-    margin: 4rem auto;
-    padding: 0 1rem;
+  .app {
+    display: flex;
+    min-height: 100vh;
   }
-  .muted {
-    color: var(--muted);
+  main {
+    flex: 1;
+    min-width: 0;
   }
 </style>
